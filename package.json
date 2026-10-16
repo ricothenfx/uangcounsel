@@ -11,7 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "gen:contracts": "node scripts/gen-contracts.mjs && tsx scripts/preanalyze.mjs"
+    "gen:contracts": "node scripts/gen-contracts.mjs && pnpm exec tsx scripts/preanalyze.mjs && pnpm exec tsx scripts/export-pdfs.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.70",

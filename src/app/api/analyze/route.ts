@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { z } from "zod";
 import { extractPdf } from "@/lib/pdf";
 import { analyzeExtracted, locateCached, llmConfigured, type Analysis } from "@/lib/analyze";
 import { getSample } from "@/lib/samples";
 import cachedAnalyses from "@/data/samples/analyses.json";
+import { SAMPLE_PDF_BASE64 } from "@/data/samples/pdfs";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -61,7 +60,9 @@ export async function POST(req: Request) {
       const cached = (cachedAnalyses as Record<string, Analysis>)[sample.id];
       if (!cached) return NextResponse.json({ error: "No cached analysis for this sample." }, { status: 500 });
 
-      const bytes = new Uint8Array(readFileSync(path.join(process.cwd(), "public", "contracts", `${sample.id}.pdf`)));
+      const b64 = SAMPLE_PDF_BASE64[sample.id];
+      if (!b64) return NextResponse.json({ error: "Sample PDF missing." }, { status: 500 });
+      const bytes = Uint8Array.from(Buffer.from(b64, "base64"));
       const extracted = await extractPdf(bytes);
       const result = locateCached(cached, extracted);
       return NextResponse.json({ ...result, analysisMs: 0 });
