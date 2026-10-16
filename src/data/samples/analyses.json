@@ -1,0 +1,169 @@
+{
+  "vendor-msa": {
+    "summary": "The agreement contains significant risks for the Client, including unfavorable terms concerning renewal and termination. The indemnification and limitation of liability clauses heavily favor the Provider.",
+    "clauses": [
+      {
+        "title": "Auto-renewal",
+        "category": "renewal",
+        "risk": "high",
+        "quote": "this Agreement shall automatically renew for successive twenty-four (24) month periods unless either party provides written notice of non-renewal",
+        "why": "The automatic renewal could lead to extended financial commitments without strategic review.",
+        "suggestion": "Negotiate for a shorter renewal period or more favorable notice terms."
+      },
+      {
+        "title": "Fees escalation",
+        "category": "payment",
+        "risk": "high",
+        "quote": "Provider may increase the monthly fee by up to eight percent (8%) upon each renewal term without Client consent",
+        "why": "This could lead to unpredictable and increasing costs without the Client's input.",
+        "suggestion": "Request a cap on any fee increases or require mutual consent for adjustments."
+      },
+      {
+        "title": "Indemnification",
+        "category": "indemnification",
+        "risk": "high",
+        "quote": "Client shall indemnify, defend, and hold harmless Provider from and against any and all claims",
+        "why": "This clause imposes significant liability on the Client for incidents arising from the services provided.",
+        "suggestion": "Seek to limit indemnification obligations to cases of Client negligence or misconduct."
+      },
+      {
+        "title": "Limitation of liability",
+        "category": "liability",
+        "risk": "high",
+        "quote": "Provider's total aggregate liability under this Agreement shall not exceed the fees paid by Client in the three (3) months preceding the claim",
+        "why": "The limitation severely caps the Client's recourse for damages caused by Provider's actions.",
+        "suggestion": "Propose an increase in liability limits or a waiver of limitations for gross negligence."
+      },
+      {
+        "title": "Termination",
+        "category": "termination",
+        "risk": "high",
+        "quote": "Provider may terminate for convenience at any time upon seven (7) days notice without penalty",
+        "why": "This gives the Provider disproportionate power to terminate the agreement without significant lead time.",
+        "suggestion": "Request a longer notice period for termination by the Provider to ensure business continuity."
+      },
+      {
+        "title": "Unilateral amendment",
+        "category": "amendment",
+        "risk": "high",
+        "quote": "Provider may modify this Agreement at any time upon thirty (30) days notice",
+        "why": "This allows the Provider to unilaterally change terms that may adversely affect the Client’s interests.",
+        "suggestion": "Negotiate for mutual agreement required for amendments to any key terms."
+      }
+    ]
+  },
+  "saas-subscription": {
+    "summary": "The agreement presents significant risks to the CLIENT, particularly in areas of auto-renewal and liability limitations. Provisions are heavily skewed in favor of the Supplier.",
+    "clauses": [
+      {
+        "title": "Auto-renewal",
+        "category": "renewal",
+        "risk": "high",
+        "quote": "The subscription automatically renews for successive twelve (12) month terms unless Customer gives written notice of non-renewal",
+        "why": "This clause can lead to unintended ongoing costs and obligations without client awareness.",
+        "suggestion": "Negotiate for a shorter renewal notice period."
+      },
+      {
+        "title": "Price escalation",
+        "category": "payment",
+        "risk": "high",
+        "quote": "Supplier may adjust subscription fees at each renewal by up to fifteen percent (15%) above the prevailing Consumer Price Index",
+        "why": "This exposes the CLIENT to unpredictable cost increases with each renewal.",
+        "suggestion": "Request a fixed fee or cap on increases."
+      },
+      {
+        "title": "Limitation of liability",
+        "category": "liability",
+        "risk": "high",
+        "quote": "Supplier's total aggregate liability shall not exceed the fees paid in the single month preceding the claim.",
+        "why": "This severely limits the CLIENT's recourse in case of damages.",
+        "suggestion": "Seek to negotiate a higher cap on liability."
+      },
+      {
+        "title": "Service levels",
+        "category": "other",
+        "risk": "medium",
+        "quote": "Availability below this target does not entitle Customer to any refund, service credit, damages, or termination right",
+        "why": "Lack of recourse for service outages impacts CLIENT's operations.",
+        "suggestion": "Add provisions for service credits in case of non-compliance."
+      },
+      {
+        "title": "Suspension",
+        "category": "other",
+        "risk": "high",
+        "quote": "Supplier may suspend the Service immediately and without notice if Supplier reasonably believes Customer's use violates this Agreement",
+        "why": "Immediate suspension can disrupt CLIENT's business without warning.",
+        "suggestion": "Introduce a requirement for prior notice and an opportunity to remedy."
+      },
+      {
+        "title": "Changes to terms",
+        "category": "amendment",
+        "risk": "medium",
+        "quote": "Supplier may modify this Agreement at any time by posting an updated version on its website.",
+        "why": "This allows the Supplier to change terms unilaterally, affecting CLIENT's rights.",
+        "suggestion": "Negotiate for mutual agreement on significant changes."
+      },
+      {
+        "title": "Customer data and exit",
+        "category": "data",
+        "risk": "high",
+        "quote": "Supplier may delete all Customer Data permanently, and a data retrieval fee of USD 5,000 applies",
+        "why": "High costs for data retrieval and potential data loss present major risks to CLIENT.",
+        "suggestion": "Remove the data retrieval fee or extend the grace period for data export."
+      }
+    ]
+  },
+  "employment-offer": {
+    "summary": "The contract includes several one-sided terms that significantly limit the Employee's rights, posing high risks for the Employee in terms of job security and professional freedom.",
+    "clauses": [
+      {
+        "title": "Non-compete",
+        "category": "termination",
+        "risk": "high",
+        "quote": "For a period of twenty-four (24) months after termination of employment, for any reason, the Employee shall not directly or indirectly engage in...",
+        "why": "This clause severely restricts the Employee's ability to find work in their field after leaving the Company.",
+        "suggestion": "Propose to reduce the non-compete duration to six months."
+      },
+      {
+        "title": "Confidentiality",
+        "category": "confidentiality",
+        "risk": "high",
+        "quote": "The Employee shall keep all Company information confidential in perpetuity, including after termination...",
+        "why": "The indefinite nature of this confidentiality obligation could hinder future employment opportunities for the Employee.",
+        "suggestion": "Negotiate for a more limited duration of confidentiality post-termination."
+      },
+      {
+        "title": "Training Clawback",
+        "category": "payment",
+        "risk": "high",
+        "quote": "If the Employee resigns within twenty-four (24) months of completing any Company-provided training, the Employee shall repay the full documented cost...",
+        "why": "This clause imposes a financial burden on the Employee for leaving the Company unexpectedly, which is disproportionately punitive.",
+        "suggestion": "Request to limit the clawback period to twelve months."
+      },
+      {
+        "title": "Variation of Duties",
+        "category": "other",
+        "risk": "medium",
+        "quote": "The Company may vary the Employee's duties, reporting line, remuneration structure and place of work at any time at its sole discretion.",
+        "why": "This clause grants the Company broad discretion, which may lead to instability in the Employee's role and compensation.",
+        "suggestion": "Seek clarification on the extent of duties that can be varied and establish mutual consent."
+      },
+      {
+        "title": "Probation and Notice",
+        "category": "termination",
+        "risk": "medium",
+        "quote": "Employment is subject to a six (6) month probationary period, during which either party may terminate with one (1) day notice.",
+        "why": "The short notice period during probation may expose the Employee to job insecurity.",
+        "suggestion": "Negotiate for a longer notice period during probation."
+      },
+      {
+        "title": "Governing Law",
+        "category": "governing_law",
+        "risk": "low",
+        "quote": "This Agreement is governed by the laws of Singapore and the Employee submits to the exclusive jurisdiction of the Singapore courts.",
+        "why": "Choosing a jurisdiction that may be unfavorable to the Employee can limit their legal recourse.",
+        "suggestion": "Consider negotiating for a more neutral governing law."
+      }
+    ]
+  }
+}
