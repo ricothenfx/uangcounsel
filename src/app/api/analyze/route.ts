@@ -94,9 +94,11 @@ export async function POST(req: Request) {
     const result = await analyzeExtracted(extracted, { generatedBy: "llm" });
     return NextResponse.json({ ...result, analysisMs: Date.now() - t0 });
   } catch (e) {
-    const msg = e instanceof Error && e.message === "analysis-unavailable"
+    console.error("[analyze] failed:", e);
+    const detail = e instanceof Error ? e.message : String(e);
+    const msg = detail === "analysis-unavailable"
       ? "The LLM endpoint failed or returned an unusable answer twice. Try again, or open a sample (precomputed)."
       : "Could not process that PDF.";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: msg, detail }, { status: 500 });
   }
 }

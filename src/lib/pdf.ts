@@ -1,6 +1,8 @@
 /**
- * Server-side PDF text extraction via pdfjs legacy build (Node-safe).
- * Returns per-page text items + page dimensions for the token index.
+ * Server-side PDF text extraction.
+ * Uses unpdf (a serverless-friendly pdf.js wrapper) so text extraction works
+ * on Vercel/Lambda without shipping the pdf.js worker. Only text + positions
+ * are needed server-side; rendering happens client-side in the browser.
  */
 import type { PdfPageInfo, PdfTextItem } from "./locate";
 
@@ -12,12 +14,8 @@ export type ExtractedPdf = {
 };
 
 export async function extractPdf(bytes: Uint8Array): Promise<ExtractedPdf> {
-  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  const loadingTask = pdfjs.getDocument({
-    data: bytes,
-    useSystemFonts: true,
-  });
-  const doc = await loadingTask.promise;
+  const { getDocumentProxy } = await import("unpdf");
+  const doc = await getDocumentProxy(new Uint8Array(bytes));
 
   const itemsPerPage: PdfTextItem[][] = [];
   const pageDims: PdfPageInfo[] = [];
@@ -41,7 +39,6 @@ export async function extractPdf(bytes: Uint8Array): Promise<ExtractedPdf> {
     text += items.map((i) => i.str).join(" ").replace(/\s+/g, " ") + "\n";
     page.cleanup();
   }
-  await loadingTask.destroy();
 
   return { itemsPerPage, pageDims, text: text.trim(), numPages: itemsPerPage.length };
 }

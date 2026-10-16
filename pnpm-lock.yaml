@@ -26,6 +26,9 @@ importers:
       react-dom:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
+      unpdf:
+        specifier: ^1.9.0
+        version: 1.9.0(@napi-rs/canvas@1.0.11)
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -2498,6 +2501,15 @@ packages:
   undici@7.30.1:
     resolution: {integrity: sha512-03KrMbjIFDWQR5RNPrSw3bd1r12JpyFQl9/yxjUbJtqkjmllqC5lFjZh6ujeuJCKr8EOQvRW872Oy/az+nLYxg==}
     engines: {node: '>=20.18.1'}
+
+  unpdf@1.9.0:
+    resolution: {integrity: sha512-YIXl+jZUBneP22IkRUwFA1b71l+Ad2uX7o7dMfxLSLuCOtaKAQvak7Sz3MtdVsWTsocblznSIGidfXyhnBgBMA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@napi-rs/canvas': ^0.1.69 || ^1.0.0
+    peerDependenciesMeta:
+      '@napi-rs/canvas':
+        optional: true
 
   unrs-resolver@1.12.2:
     resolution: {integrity: sha512-dmlRxBJJayXjqTwC+JtF1HhJmgf3ftQ3YejFcZrf4+KKtJv0qDsK1pjqaaVjG7wJ5NJ6UVP1OqRMQ71Z4C3rxQ==}
@@ -5125,6 +5137,10 @@ snapshots:
   undici-types@7.24.6: {}
 
   undici@7.30.1: {}
+
+  unpdf@1.9.0(@napi-rs/canvas@1.0.11):
+    optionalDependencies:
+      '@napi-rs/canvas': 1.0.11
 
   unrs-resolver@1.12.2:
     dependencies:
