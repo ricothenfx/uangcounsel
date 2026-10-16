@@ -2,15 +2,19 @@
 
 import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
-
-const LINKS = [
-  { href: "/#review", label: "Review" },
-  { href: "/#samples", label: "Samples" },
-  { href: "/#how", label: "How it works" },
-  { href: "/qa", label: "Q&A" },
-];
+import { LanguageToggle } from "./language-toggle";
+import { useI18n } from "@/lib/i18n/provider";
 
 export function Nav() {
+  const { dict } = useI18n();
+
+  const LINKS = [
+    { href: "/#review", label: dict.nav.review },
+    { href: "/#samples", label: dict.nav.samples },
+    { href: "/#how", label: dict.nav.how },
+    { href: "/qa", label: dict.nav.qa },
+  ];
+
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-bg/85 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
@@ -30,7 +34,8 @@ export function Nav() {
             </Link>
           ))}
         </nav>
-        <div className="ml-auto sm:ml-0">
+        <div className="ml-auto sm:ml-0 flex items-center gap-2">
+          <LanguageToggle />
           <ThemeToggle />
         </div>
       </div>

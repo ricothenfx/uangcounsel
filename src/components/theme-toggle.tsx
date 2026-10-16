@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useI18n } from "@/lib/i18n/provider";
 
 export function ThemeToggle() {
   const [dark, setDark] = useState(false);
+  const { dict } = useI18n();
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
@@ -27,8 +29,8 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-      title={dark ? "Light mode" : "Dark mode"}
+      aria-label={dark ? dict.common.toLight : dict.common.toDark}
+      title={dark ? dict.common.toLight : dict.common.toDark}
       className="relative h-9 w-9 rounded-lg border border-line bg-card hover:bg-card-2 transition-colors grid place-items-center"
     >
       {/* scales-of-justice lamp: gavel by day, lantern by night */}
@@ -50,7 +52,7 @@ export function ThemeToggle() {
           </>
         )}
       </svg>
-      <span className="sr-only">Toggle theme</span>
+      <span className="sr-only">{dict.common.toggleTheme}</span>
     </button>
   );
 }

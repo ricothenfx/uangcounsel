@@ -4,17 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { SAMPLES, type SampleMeta } from "@/lib/samples";
 import type { AnalyzedDocument, Risk } from "@/lib/analyze";
+import { useI18n } from "@/lib/i18n/provider";
 
 const RISK_ORDER: Risk[] = ["high", "medium", "low"];
-const RISK_LABEL: Record<Risk, string> = { high: "High risk", medium: "Review", low: "OK" };
 const HL_CLASS: Record<Risk, string> = { high: "hl-high", medium: "hl-medium", low: "hl-low" };
-
-const STAGES = [
-  "Reading document…",
-  "Extracting clauses…",
-  "Weighing risks…",
-  "Locating quotes on the page…",
-];
 
 type HighlightBox = {
   clause: number;
@@ -27,6 +20,9 @@ type HighlightBox = {
 type PageRender = { canvas: HTMLCanvasElement; width: number; height: number; hl: HighlightBox[] };
 
 export function Reviewer() {
+  const { dict, t } = useI18n();
+  const r = dict.reviewer;
+
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -72,14 +68,14 @@ export function Reviewer() {
       if (doc) {
         doc.clauses.forEach((c, ci) => {
           if (!c.location || c.location.page !== p) return;
-          for (const r of c.location!.rects) {
+          for (const rect of c.location!.rects) {
             hl.push({
               clause: ci,
               risk: c.risk,
-              left: r.x0 * scale,
-              top: (base.height - r.yTop) * scale,
-              width: (r.x1 - r.x0) * scale,
-              height: Math.max(6, (r.yTop - r.yBot) * scale),
+              left: rect.x0 * scale,
+              top: (base.height - rect.yTop) * scale,
+              width: (rect.x1 - rect.x0) * scale,
+              height: Math.max(6, (rect.yTop - rect.yBot) * scale),
             });
           }
         });
@@ -89,12 +85,12 @@ export function Reviewer() {
     setPages(renders);
   }, [loadPdfjs]);
 
-  const startStages = () => {
+  const startStages = useCallback(() => {
     setStage(0);
     stageTimer.current = setInterval(() => {
-      setStage((s) => Math.min(s + 1, STAGES.length - 1));
+      setStage((s) => Math.min(s + 1, r.stages.length - 1));
     }, 1600);
-  };
+  }, [r]);
   const stopStages = () => {
     if (stageTimer.current) clearInterval(stageTimer.current);
     stageTimer.current = null;
@@ -117,8 +113,8 @@ export function Reviewer() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Analysis failed.");
-        if (data.code === "no-llm") setNotice("Tip: the three sample contracts below work without any API key — their analysis ships precomputed.");
+        setError(data.error ?? r.analysisFailed);
+        if (data.code === "no-llm") setNotice(r.noLlmTip);
         return;
       }
       const result = data as AnalyzedDocument;
@@ -132,25 +128,25 @@ export function Reviewer() {
       }
       if (buf) await renderPages(buf, docHostRef.current!, result);
     } catch {
-      setError("Network error — could not reach the analysis endpoint.");
+      setError(r.networkError);
     } finally {
       stopStages();
       setBusy(false);
     }
-  }, [renderPages]);
+  }, [renderPages, r, startStages]);
 
   const onSample = (s: SampleMeta) => {
-    void analyze({ sampleId: s.id }, s.title, null);
+    void analyze({ sampleId: s.id }, dict.samples[s.id].title, null);
   };
 
   const onUpload = async (file: File) => {
     if (!file.name.toLowerCase().endsWith(".pdf")) {
-      setError("Please choose a PDF file.");
+      setError(r.choosePdf);
       return;
     }
     const buf = new Uint8Array(await file.arrayBuffer());
     if (buf.byteLength > 8 * 1024 * 1024) {
-      setError("PDF too large (max 8 MB).");
+      setError(r.tooLarge);
       return;
     }
     let b64 = "";
@@ -175,14 +171,14 @@ export function Reviewer() {
   const copySummary = async () => {
     if (!analysis) return;
     const md = [
-      `# Contract review — ${docLabel}`,
+      `# ${t(r.copyTitle, { doc: docLabel ?? "" })}`,
       analysis.summary ? `\n${analysis.summary}\n` : "",
       ...analysis.clauses.map((c, i) =>
         `## ${i + 1}. [${c.risk.toUpperCase()}] ${c.title}\n` +
-        `- Excerpt: "${c.quote}"\n` +
-        `- Why it matters: ${c.why}\n` +
-        `- Negotiation ask: ${c.suggestion}\n`),
-      `_AI-assisted review — directional, not legal advice._`,
+        `- ${r.copyExcerpt}: "${c.quote}"\n` +
+        `- ${r.copyWhy}: ${c.why}\n` +
+        `- ${r.copyAsk}: ${c.suggestion}\n`),
+      `_${r.copyDisclaimer}_`,
     ].join("\n");
     await navigator.clipboard.writeText(md);
     setCopied(true);
@@ -192,7 +188,7 @@ export function Reviewer() {
   useEffect(() => () => stopStages(), []);
 
   const counts = analysis
-    ? RISK_ORDER.map((r) => ({ risk: r, n: analysis.clauses.filter((c) => c.risk === r).length }))
+    ? RISK_ORDER.map((risk) => ({ risk, n: analysis.clauses.filter((c) => c.risk === risk).length }))
     : [];
 
   return (
@@ -200,7 +196,7 @@ export function Reviewer() {
       {/* ---- controls ---- */}
       <div className="card p-5 sm:p-6">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-sm font-medium">Try a sample contract</span>
+          <span className="text-sm font-medium">{r.trySample}</span>
           <div className="flex flex-wrap gap-2">
             {SAMPLES.map((s) => (
               <button
@@ -209,17 +205,17 @@ export function Reviewer() {
                 onClick={() => onSample(s)}
                 disabled={busy}
                 className={`rounded-lg border px-3 py-1.5 text-sm transition-colors disabled:opacity-50 ${
-                  docLabel === s.title
+                  docLabel === dict.samples[s.id].title
                     ? "border-accent bg-accent-soft text-fg"
                     : "border-line bg-card hover:bg-card-2"
                 }`}
               >
-                {s.type.split(" · ")[0]}
+                {dict.samples[s.id].type.split(" · ")[0]}
               </button>
             ))}
           </div>
           <label className="ml-auto cursor-pointer rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-brand-fg hover:opacity-90 transition-opacity">
-            Upload your PDF
+            {r.upload}
             <input
               type="file"
               accept="application/pdf,.pdf"
@@ -232,10 +228,7 @@ export function Reviewer() {
             />
           </label>
         </div>
-        <p className="mt-2 text-xs text-muted">
-          Samples: real PDFs analyzed by the same pipeline, precomputed so they open instantly.
-          Uploads run live through the LLM pipeline. Text-based PDFs only (max 8 MB).
-        </p>
+        <p className="mt-2 text-xs text-muted">{r.samplesNote}</p>
       </div>
 
       {/* ---- progress / error ---- */}
@@ -243,7 +236,7 @@ export function Reviewer() {
         <div className="card overflow-hidden p-0">
           <div className="h-1 shimmer" />
           <div className="p-5">
-            <p className="text-sm font-medium">{STAGES[stage]}</p>
+            <p className="text-sm font-medium">{r.stages[stage]}</p>
             <div className="mt-3 space-y-2" aria-hidden>
               {[0, 1, 2].map((i) => (
                 <div key={i} className="h-3 rounded bg-card-2" style={{ width: `${88 - i * 18}%` }} />
@@ -268,9 +261,13 @@ export function Reviewer() {
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold">{docLabel}</p>
                 <p className="text-xs text-muted">
-                  {analysis.numPages} page{analysis.numPages > 1 ? "s" : ""} ·{" "}
-                  {analysis.generatedBy === "cached" ? "precomputed analysis" : `live analysis${analysisMs ? ` in ${(analysisMs / 1000).toFixed(1)}s` : ""}`} ·
-                  every flag points at its source text
+                  {t(r.pages, { n: analysis.numPages })} ·{" "}
+                  {analysis.generatedBy === "cached"
+                    ? r.precomputed
+                    : analysisMs
+                      ? t(r.liveAnalysis, { s: (analysisMs / 1000).toFixed(1) })
+                      : r.live}{" "}
+                  · {r.flagsNote}
                 </p>
               </div>
               <button
@@ -278,7 +275,7 @@ export function Reviewer() {
                 onClick={() => void copySummary()}
                 className="shrink-0 rounded-lg border border-line px-3 py-1.5 text-xs hover:bg-card-2 transition-colors"
               >
-                {copied ? "Copied ✓" : "Copy summary"}
+                {copied ? r.copied : r.copySummary}
               </button>
             </div>
             <div ref={docHostRef} className="max-h-[70vh] space-y-4 overflow-y-auto bg-card-2 p-4">
@@ -310,7 +307,7 @@ export function Reviewer() {
               {analysis.summary ? (
                 <p className="text-sm leading-relaxed">{analysis.summary}</p>
               ) : (
-                <p className="text-sm text-muted">{analysis.clauses.length} notable clauses found.</p>
+                <p className="text-sm text-muted">{t(r.noClauses, { n: analysis.clauses.length })}</p>
               )}
               <div className="mt-3 flex gap-2">
                 {counts.map(({ risk, n }) =>
@@ -323,7 +320,7 @@ export function Reviewer() {
                         "border-ok/40 text-ok"
                       }`}
                     >
-                      {n} × {RISK_LABEL[risk]}
+                      {n} × {r.riskLabel[risk]}
                     </span>
                   ) : null,
                 )}
@@ -351,13 +348,13 @@ export function Reviewer() {
                           "bg-ok/10 text-ok"
                         }`}
                       >
-                        {c.risk}
+                        {r.risk[c.risk]}
                       </span>
                       <span className="text-sm font-semibold">{c.title}</span>
                       {c.location ? (
                         <span className="ml-auto text-[10px] text-muted">p.{c.location.page}</span>
                       ) : (
-                        <span className="ml-auto text-[10px] text-muted">quote not found</span>
+                        <span className="ml-auto text-[10px] text-muted">{r.notFound}</span>
                       )}
                     </div>
                     <p className="mt-2 border-l-2 border-accent/50 pl-3 text-xs italic text-muted">
@@ -374,4 +371,3 @@ export function Reviewer() {
     </div>
   );
 }
-

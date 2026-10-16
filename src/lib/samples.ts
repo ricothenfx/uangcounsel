@@ -1,5 +1,7 @@
+export type SampleId = "vendor-msa" | "saas-subscription" | "employment-offer";
+
 export type SampleMeta = {
-  id: string;
+  id: SampleId;
   title: string;
   party: string;
   type: string;

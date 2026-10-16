@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { I18nProvider } from "@/lib/i18n/provider";
+import { getDictionary, getLocale } from "@/lib/i18n/server";
+import { LOCALES_META } from "@/lib/i18n/config";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const grotesk = Space_Grotesk({ variable: "--font-grotesk", subsets: ["latin"] });
@@ -9,31 +12,36 @@ const themeInit = `(function(){try{var s=localStorage.getItem("uangcounsel-theme
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://uangcounsel.vercel.app";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: "UangCounsel — AI contract review with receipts",
-    template: "%s · UangCounsel",
-  },
-  description:
-    "Upload a contract, watch an LLM read it clause by clause, and get risk flags with the exact text highlighted on the document. Not opinions — receipts.",
-  openGraph: {
-    title: "UangCounsel — AI contract review with receipts",
-    description:
-      "AI contract review where every risk flag points at the exact clause text that triggered it. A portfolio build by Rico.",
-    url: siteUrl,
-    siteName: "UangCounsel",
-    type: "website",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { meta } = await getDictionary();
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: meta.titleDefault,
+      template: "%s · UangCounsel",
+    },
+    description: meta.description,
+    openGraph: {
+      title: meta.ogTitle,
+      description: meta.ogDescription,
+      url: siteUrl,
+      siteName: "UangCounsel",
+      type: "website",
+    },
+  };
+}
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+  const dict = await getDictionary();
   return (
-    <html lang="en" className={`${inter.variable} ${grotesk.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang={LOCALES_META[locale].bcp47} className={`${inter.variable} ${grotesk.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <I18nProvider locale={locale} dict={dict}>{children}</I18nProvider>
+      </body>
     </html>
   );
 }
